@@ -8,15 +8,20 @@ module Gdpr
     ##
     # This is the only method made available to the models.
     # It helps setup the gdpr configuration with some nifty options.
+    #
     # When used, it defines the class method `.scrub`, which is the entrypoint for all scrubbing
     # for that particular model.
     #
-    # Instead of encouraging to implement GDPR methods inside the model(they are already cluttered enough).
-    # Configurations:
-    # * It defaults to a Descendent to BaseScrubber using naming conventions.
-    #     Devs can point to the scrubber  Scrubber classes like `Gdpr::CallScrubber`
-    # * Allows passing a Symbol pointing to a local method inside the class
-    # * Allows passing a Proc for inline processing
+    # Instead of encouraging to implement GDPR methods inside the model(they are already cluttered enough),
+    # it points to an external scrubber class by default.
+    #
+    # Configuration:
+    # * Allows passing a Scrubber class. Defaults to a BaseScrubber child
+    #   using a name convention: `Gdpr::{ModelName}Scrubber.`
+    # * Allows passing a Symbol pointing to a local method inside the model
+    # * Allows passing a Proc for inline scrubbing
+    # 
+    # @param scrubber [BaseScrubber, Symbol, Proc] scrubbing strategy
     # 
     def enable_gdpr(scrubber: nil)
       if scrubber.is_a?(Symbol)
