@@ -44,6 +44,8 @@ module Gdpr
     #
     def scrub(record)
       hash = scrub_hash(record)
+      hash.merge!(updated_at: Time.now) if record.has_attribute?(:updated_at)
+      
       record.update_attributes(hash) if hash.present?
     end
 
