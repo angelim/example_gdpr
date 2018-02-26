@@ -1,6 +1,19 @@
 module Gdpr
-  class BaseScrubber
+  module BaseScrubber
+    extend ActiveSupport::Concern
+    
     attr_reader :user_id
+
+    module ClassMethods
+      ##
+      # This is just an entry point forwarding all calls to the scrubbing method.
+      # Allows calling `ChildScrubber.perform(arg1, arg2)`
+      #        Same as `ChildScrubber.new(arg1, arg2).scrub_records`
+      #
+      def perform(*args)
+        new(*args).scrub_records
+      end
+    end
 
     ##
     # Generates the hash that will be used to update the record
@@ -26,15 +39,6 @@ module Gdpr
     def initialize(account_id, user_id)
       # Account.find(account_id)
       @user_id = user_id
-    end
-
-    ##
-    # This is just an entry point forwarding all calls to the scrubbing method.
-    # Allows calling `ChildScrubber.perform(arg1, arg2)`
-    #        Same as `ChildScrubber.new(arg1, arg2).scrub_records`
-    #
-    def self.perform(*args)
-      new(*args).scrub_records
     end
 
     ##

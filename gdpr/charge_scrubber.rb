@@ -1,5 +1,6 @@
 module Gdpr
-  class ChargeScrubber < BaseScrubber
+  class ChargeScrubber
+    include Gdpr::BaseScrubber
 
     def gdpr_records
       calls = Call.find_all_by_user_id(user_id)

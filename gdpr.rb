@@ -23,7 +23,7 @@ module Gdpr
     # 
     # @param scrubber [BaseScrubber, Symbol, Proc] scrubbing strategy
     # 
-    def enable_gdpr(scrubber: nil)
+    def enable_gdpr(scrubber: nil, async: false)
       if scrubber.is_a?(Symbol)
         define_singleton_method :scrub do |*args|
           send(scrubber, *args)
@@ -38,7 +38,11 @@ module Gdpr
         raise ArgumentError.new("#{scrubber} is not defined") unless scrubber_klass
         
         define_singleton_method :scrub do |*args|
-          scrubber_klass.perform(*args)
+          if async && scrubber_klass.respond_to?(:enqueue)
+            scrubber_klass.enqueue(*args)
+          else
+            scrubber_klass.perform(*args)
+          end
         end
       end
     end
@@ -50,7 +54,7 @@ SuperModel::Base.send(:extend, Gdpr::Extension)
 require_relative 'gdpr/base_scrubber'
 require_relative 'gdpr/call_scrubber'
 require_relative 'gdpr/charge_scrubber'
-require_relative 'gdpr/custom_leg_scrubber'
+require_relative 'jobs/leg_scrubber_job'
 require_relative 'models/leg'
 require_relative 'models/call'
 require_relative 'models/user'
