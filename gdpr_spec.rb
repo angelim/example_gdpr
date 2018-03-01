@@ -122,8 +122,8 @@ describe Leg do
     GdprJob.new('any_account','aangelim').perform
     expect(call.from).to eq(Gdpr::REPLACE_STRING)
     expect(leg_1.phone).to eq(Gdpr::REPLACE_STRING)
-    expect(leg_1.name).to eq(Gdpr::CustomLegScrubber::NAME_REPLACEMENT)
-    expect(leg_2.name).to eq(Gdpr::CustomLegScrubber::NAME_REPLACEMENT)
+    expect(leg_1.name).to eq(Jobs::LegScrubberJob::NAME_REPLACEMENT)
+    expect(leg_2.name).to eq(Jobs::LegScrubberJob::NAME_REPLACEMENT)
     expect(leg_3.name).to eq('my name')
   end
 end

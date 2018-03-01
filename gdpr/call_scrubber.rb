@@ -1,5 +1,6 @@
 module Gdpr
-  class CallScrubber < BaseScrubber
+  class CallScrubber
+    include Gdpr::BaseScrubber
 
     def gdpr_records
       Call.find_all_by_user_id(user_id)
@@ -10,8 +11,8 @@ module Gdpr
     #
     def scrub_hash(record)
       {}.tap do |attrs|
-        attrs.merge!(from: Gdpr::REPLACE_STRING) if record.inbound?
-        attrs.merge!(to: Gdpr::REPLACE_STRING) if record.outbound?
+        attrs.merge!(from: Gdpr::REPLACE_STRING)  if record.inbound?
+        attrs.merge!(to: Gdpr::REPLACE_STRING)    if record.outbound?
       end
     end
   end

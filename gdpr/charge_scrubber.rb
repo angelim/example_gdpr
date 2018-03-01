@@ -1,5 +1,6 @@
 module Gdpr
-  class ChargeScrubber < BaseScrubber
+  class ChargeScrubber
+    include Gdpr::BaseScrubber
 
     def gdpr_records
       calls = Call.find_all_by_user_id(user_id)
@@ -13,6 +14,10 @@ module Gdpr
       { name: Gdpr::REPLACE_STRING, contents: parse_and_replace_contents(record) }
     end
 
+    ##
+    # `record.contents` is a json field and we have to do
+    # partial replacement
+    #
     def parse_and_replace_contents(record)
       JSON.parse(record.contents).tap do |content|
         content['from'] = Gdpr::REPLACE_STRING if record.call.inbound?

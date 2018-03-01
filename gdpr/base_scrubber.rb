@@ -1,13 +1,33 @@
 module Gdpr
-  class BaseScrubber
+  module BaseScrubber
+    extend ActiveSupport::Concern
+    
     attr_reader :user_id
 
+    module ClassMethods
+      ##
+      # This is just an entry point forwarding all calls to the scrubbing method.
+      # Allows calling `ChildScrubber.perform(arg1, arg2)`
+      #        Same as `ChildScrubber.new(arg1, arg2).scrub_records`
+      #
+      def perform(*args)
+        new(*args).scrub_records
+      end
+    end
+
+    ##
+    # Generates the hash that will be used to update the record
+    # @param record [Model] the record, so we can use conditionals
+    #                       or any other required calculations.
+    #
+    # @return [Hash] update hash
+    # 
     def scrub_hash(record)
       raise NotImplementedError
     end
 
     ##
-    # @return [Array<Object>] list of records to scrub
+    # @return [Array<Model>] list of records to scrub
     #
     def gdpr_records
       raise NotImplementedError
@@ -22,20 +42,14 @@ module Gdpr
     end
 
     ##
-    # This is just an entry point forwarding all calls to the scrubbing method.
-    # Allows calling `ChildScrubber.perform(arg1, arg2)`
-    #
-    def self.perform(*args)
-      new(*args).scrub_records
-    end
-
-    ##
     # Updates the record using the calculated
     # set of changed attributes
-    # @param record [#update_attributes] model to update
+    # @param record [Model] model to update
     #
     def scrub(record)
       hash = scrub_hash(record)
+      hash.merge!(updated_at: Time.now) if record.has_attribute?(:updated_at)
+      
       record.update_attributes(hash) if hash.present?
     end
 

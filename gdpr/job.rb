@@ -6,10 +6,10 @@
 # the scrubbers
 #
 class GdprJob < Struct.new(:account_id, :user_id)
-  GDPR_MODELS = [ "Call", "Leg", "User", "Charge", "Transfer" ].freeze
+  GDPR_MODELS = [ Call, Leg, User, Charge, Transfer].freeze
   
   def perform
-    GDPR_MODELS.each{ |model| model.to_s.constantize.scrub(account_id, user_id) }
+    GDPR_MODELS.each{ |model| model.scrub(account_id, user_id) }
     # Gdpr::CrazyModel.scrub(user_id, something_else)
   end  
 end
